@@ -3,5 +3,5 @@ package adapter
 import "reptile/domain/model"
 
 type PokemonGetter interface {
-	pokemons(url string) []model.Pokemon
+	pokemons() []model.Pokemon
 }
