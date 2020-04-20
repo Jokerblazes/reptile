@@ -1,12 +1,14 @@
 package model
 
 type Pokemon struct {
+	Id int
 	BasicProperty
 	PowerProperty
 }
 
 type BasicProperty struct {
 	Height string //m
+
 	Weight string //kg
 }
 
