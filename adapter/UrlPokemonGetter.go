@@ -16,7 +16,6 @@ const (
 )
 
 type UrlPokemonGetter struct {
-	url string
 }
 
 func (getter UrlPokemonGetter) pokemonDetailHtml(number int) map[string]*goquery.Selection {
@@ -54,7 +53,7 @@ func (getter UrlPokemonGetter) send(number int) (*http.Response, error) {
 func (getter UrlPokemonGetter) Pokemons() []model.Pokemon {
 	pokemons := make([]model.Pokemon, 649)
 	for i := 1; i < 650; i++ {
-		selectionMap := getter.pokemonDetailHtml(1)
+		selectionMap := getter.pokemonDetailHtml(i)
 		pokemons[i-1] = getter.generatorHtmlToPokemon(selectionMap)
 	}
 	return pokemons
