@@ -87,6 +87,7 @@ func (getter UrlPokemonGetter) statusMap(statusSelection *goquery.Selection) map
 			current = current.NextSibling.NextSibling
 		}
 	})
+	return statusMap
 }
 
 func (getter UrlPokemonGetter) minutiaMap(minutiaSelection *goquery.Selection) map[string]string {
@@ -101,4 +102,5 @@ func (getter UrlPokemonGetter) minutiaMap(minutiaSelection *goquery.Selection) m
 			current = current.NextSibling.NextSibling
 		}
 	})
+	return minutiaMap
 }
