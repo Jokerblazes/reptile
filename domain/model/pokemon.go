@@ -6,16 +6,16 @@ type Pokemon struct {
 }
 
 type BasicProperty struct {
-	height float32 //m
-	weight float32 //kg
+	Height string //m
+	Weight string //kg
 }
 
 type PowerProperty struct {
-	name    string
-	hp      int
-	attack  int
-	defense int
-	speed   int
-	spAtk   int
-	spDef   int
+	Name    string
+	Hp      int
+	Attack  int
+	Defense int
+	Speed   int
+	SpAtk   int
+	SpDef   int
 }

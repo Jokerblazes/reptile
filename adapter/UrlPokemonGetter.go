@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"reptile/domain/model"
+	"strconv"
 )
 
 const (
@@ -20,7 +21,7 @@ type UrlPokemonGetter struct {
 
 func (getter UrlPokemonGetter) pokemonDetailHtml(number int) map[string]*goquery.Selection {
 	res, err := getter.send(number)
-
+	defer res.Body.Close()
 	return getter.selections(err, res)
 }
 
@@ -45,7 +46,6 @@ func (getter UrlPokemonGetter) send(number int) (*http.Response, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer res.Body.Close()
 	if res.StatusCode != 200 {
 		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
 	}
@@ -66,12 +66,16 @@ func (getter UrlPokemonGetter) generatorHtmlToPokemon(selectionMap map[string]*g
 	minutiaMap := getter.minutiaMap(minutiaSelection)
 	statusMap := getter.statusMap(statusSelection)
 
-	fmt.Println(name)
-	fmt.Println(minutiaMap)
-	fmt.Println(statusMap)
+	hp, _ := strconv.Atoi(statusMap["HP"])
+	attack, _ := strconv.Atoi(statusMap["Attack"])
+	defense, _ := strconv.Atoi(statusMap["Defense"])
+	speed, _ := strconv.Atoi(statusMap["speed"])
+	spAtk, _ := strconv.Atoi(statusMap["Sp Atk"])
+	spDef, _ := strconv.Atoi(statusMap["Sp Def"])
+
 	pokemon := model.Pokemon{
-		BasicProperty: model.BasicProperty{},
-		PowerProperty: model.PowerProperty{},
+		BasicProperty: model.BasicProperty{Height: minutiaMap["Height:"], Weight: minutiaMap["Weight:"]},
+		PowerProperty: model.PowerProperty{Name: name, Hp: hp, Attack: attack, Defense: defense, Speed: speed, SpAtk: spAtk, SpDef: spDef},
 	}
 
 	return []model.Pokemon{pokemon}
