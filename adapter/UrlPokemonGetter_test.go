@@ -17,7 +17,7 @@ func TestUrlPokemonGetter_pokemons(t *testing.T) {
 			getter := UrlPokemonGetter{
 				url: tt.fields.url,
 			}
-			pokemons := getter.pokemons()
+			pokemons := getter.Pokemons()
 			if pokemons == nil {
 				t.Fail()
 			}

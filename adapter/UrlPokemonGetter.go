@@ -51,13 +51,16 @@ func (getter UrlPokemonGetter) send(number int) (*http.Response, error) {
 	}
 	return res, err
 }
-func (getter UrlPokemonGetter) pokemons() []model.Pokemon {
-
-	selectionMap := getter.pokemonDetailHtml(1)
-	return getter.generatorHtmlToPokemon(selectionMap)
+func (getter UrlPokemonGetter) Pokemons() []model.Pokemon {
+	pokemons := make([]model.Pokemon, 649)
+	for i := 1; i < 650; i++ {
+		selectionMap := getter.pokemonDetailHtml(1)
+		pokemons[i-1] = getter.generatorHtmlToPokemon(selectionMap)
+	}
+	return pokemons
 }
 
-func (getter UrlPokemonGetter) generatorHtmlToPokemon(selectionMap map[string]*goquery.Selection) []model.Pokemon {
+func (getter UrlPokemonGetter) generatorHtmlToPokemon(selectionMap map[string]*goquery.Selection) model.Pokemon {
 	headerSelection := selectionMap[Header]
 	statusSelection := selectionMap[Status]
 	minutiaSelection := selectionMap[Minutia]
@@ -77,8 +80,7 @@ func (getter UrlPokemonGetter) generatorHtmlToPokemon(selectionMap map[string]*g
 		BasicProperty: model.BasicProperty{Height: minutiaMap["Height:"], Weight: minutiaMap["Weight:"]},
 		PowerProperty: model.PowerProperty{Name: name, Hp: hp, Attack: attack, Defense: defense, Speed: speed, SpAtk: spAtk, SpDef: spDef},
 	}
-
-	return []model.Pokemon{pokemon}
+	return pokemon
 }
 
 func (getter UrlPokemonGetter) statusMap(statusSelection *goquery.Selection) map[string]string {
