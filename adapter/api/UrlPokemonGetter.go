@@ -54,12 +54,12 @@ func (getter UrlPokemonGetter) Pokemons() []model.Pokemon {
 	pokemons := make([]model.Pokemon, 649)
 	for i := 1; i < 650; i++ {
 		selectionMap := getter.pokemonDetailHtml(i)
-		pokemons[i-1] = getter.generatorHtmlToPokemon(selectionMap)
+		pokemons[i-1] = getter.generatorHtmlToPokemon(selectionMap, i)
 	}
 	return pokemons
 }
 
-func (getter UrlPokemonGetter) generatorHtmlToPokemon(selectionMap map[string]*goquery.Selection) model.Pokemon {
+func (getter UrlPokemonGetter) generatorHtmlToPokemon(selectionMap map[string]*goquery.Selection, id int) model.Pokemon {
 	headerSelection := selectionMap[Header]
 	statusSelection := selectionMap[Status]
 	minutiaSelection := selectionMap[Minutia]
@@ -76,6 +76,7 @@ func (getter UrlPokemonGetter) generatorHtmlToPokemon(selectionMap map[string]*g
 	spDef, _ := strconv.Atoi(statusMap["Sp Def"])
 
 	pokemon := model.Pokemon{
+		Id:            id,
 		BasicProperty: model.BasicProperty{Height: minutiaMap["Height:"], Weight: minutiaMap["Weight:"]},
 		PowerProperty: model.PowerProperty{Name: name, Hp: hp, Attack: attack, Defense: defense, Speed: speed, SpAtk: spAtk, SpDef: spDef},
 	}
