@@ -5,12 +5,22 @@ import "reptile/domain/model"
 type MysqlPokemanRepository struct {
 }
 
+var instance *MysqlPokemanRepository
+
+func Instance() *MysqlPokemanRepository {
+	if instance == nil {
+		instance = &MysqlPokemanRepository{}
+	}
+
+	return instance
+}
+
 func (repository MysqlPokemanRepository) Pokemons() []model.Pokemon {
 
 	return nil
 }
 
-func (repository MysqlPokemanRepository) savePokemons(pokemons []model.Pokemon) int {
+func (repository MysqlPokemanRepository) SavePokemons(pokemons []model.Pokemon) int {
 	db := Db()
 	defer db.Close()
 	stmtIns, err := db.Prepare("INSERT INTO `pokemon` (`id`, `name`, `hp`, `attack`, `defense`, `speed`, `sp_atk`, `sp_def`, `height`, `weight`) " +
