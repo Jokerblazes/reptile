@@ -8,6 +8,12 @@ import (
 	"reptile/domain/model"
 )
 
+const (
+	Header  = "header"
+	Status  = "status"
+	Minutia = "minutia"
+)
+
 type UrlPokemonGetter struct {
 	url string
 }
@@ -42,6 +48,32 @@ func (getter UrlPokemonGetter) pokemons() []model.Pokemon {
 }
 
 func (getter UrlPokemonGetter) generatorHtmlToPokemon(selectionMap map[string]*goquery.Selection) []model.Pokemon {
+	headerSelection := selectionMap[Header]
+	statusSelection := selectionMap[Status]
+	minutiaSelection := selectionMap[Minutia]
+	name := headerSelection.Nodes[0].LastChild.Data
+	minutiaMap := make(map[string]string)
+	minutiaSelection.Each(func(i int, selection *goquery.Selection) {
+		first := selection.Nodes[0].FirstChild
+		current := first
+		for current != nil {
+			if current.NextSibling.FirstChild != nil {
+				minutiaMap[current.FirstChild.Data] = current.NextSibling.FirstChild.Data
+			}
+			current = current.NextSibling.NextSibling
+		}
+	})
+
+	statusMap := make(map[string]string)
+	statusSelection.Each(func(i int, selection *goquery.Selection) {
+		first := selection.Nodes[0].FirstChild
+		current := first
+		for current != nil {
+			statusMap[current.FirstChild.Data] = current.NextSibling.LastChild.FirstChild.Data
+			current = current.NextSibling.NextSibling
+		}
+	})
+	fmt.Println(name)
 	pokemon := model.Pokemon{
 		BasicProperty: model.BasicProperty{},
 		PowerProperty: model.PowerProperty{},
