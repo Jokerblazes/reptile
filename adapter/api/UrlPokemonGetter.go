@@ -61,7 +61,7 @@ func (getter UrlPokemonGetter) send(number int) (*http.Response, error) {
 	return res, err
 }
 func (getter UrlPokemonGetter) Pokemons() []model.Pokemon {
-	pokemons := make([]model.Pokemon, 649)
+	var pokemons []model.Pokemon
 	for i := 1; i < 650; i++ {
 		selectionMap := getter.pokemonDetailHtml(i)
 		pokemons[i-1] = getter.generatorHtmlToPokemon(selectionMap, i)
