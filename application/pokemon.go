@@ -11,5 +11,5 @@ func Reptile() {
 	pokemons := getter.Pokemons()
 
 	var saver = db.Instance()
-	saver.SavePokemons(pokemons)
+	saver.Save(pokemons)
 }

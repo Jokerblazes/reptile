@@ -2,17 +2,17 @@ package model
 
 type Pokemon struct {
 	Id int
-	BasicProperty
-	PowerProperty
+	Basic
+	Power
 }
 
-type BasicProperty struct {
+type Basic struct {
 	Height string //m
 
 	Weight string //kg
 }
 
-type PowerProperty struct {
+type Power struct {
 	Name    string
 	Hp      int
 	Attack  int

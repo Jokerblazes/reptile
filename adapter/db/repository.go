@@ -2,25 +2,25 @@ package db
 
 import "reptile/domain/model"
 
-type MysqlPokemanRepository struct {
+type Repository struct {
 }
 
-var instance *MysqlPokemanRepository
+var instance *Repository
 
-func Instance() *MysqlPokemanRepository {
+func Instance() *Repository {
 	if instance == nil {
-		instance = &MysqlPokemanRepository{}
+		instance = &Repository{}
 	}
 
 	return instance
 }
 
-func (repository MysqlPokemanRepository) Pokemons() []model.Pokemon {
+func (repository Repository) Pokemons() []model.Pokemon {
 
 	return nil
 }
 
-func (repository MysqlPokemanRepository) SavePokemons(pokemons []model.Pokemon) int {
+func (repository Repository) Save(pokemons []model.Pokemon) int {
 	db := Db()
 	defer db.Close()
 	stmtIns, err := db.Prepare("INSERT INTO `pokemon` (`id`, `name`, `hp`, `attack`, `defense`, `speed`, `sp_atk`, `sp_def`, `height`, `weight`) " +
