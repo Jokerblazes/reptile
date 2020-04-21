@@ -10,7 +10,7 @@ import (
 type PokemonGetter struct {
 }
 
-func (getter PokemonGetter) Pokemons() []model.Pokemon {
+func (getter *PokemonGetter) Pokemons() []model.Pokemon {
 	pokemons := make([]model.Pokemon, 649)
 	for i := 1; i < 650; i++ {
 		selectionMap := getter.pokemonDetailHtml(i)
@@ -19,7 +19,7 @@ func (getter PokemonGetter) Pokemons() []model.Pokemon {
 	return pokemons
 }
 
-func (getter PokemonGetter) pokemonDetailHtml(number int) map[string]interface{} {
+func (getter *PokemonGetter) pokemonDetailHtml(number int) map[string]interface{} {
 	const (
 		seleniumPath = `./chromedriver`
 		port         = 9515
@@ -93,7 +93,7 @@ func (getter PokemonGetter) pokemonDetailHtml(number int) map[string]interface{}
 	}
 }
 
-func (getter PokemonGetter) generatorHtmlToPokemon(pokemonMap map[string]interface{}, number int) model.Pokemon {
+func (getter *PokemonGetter) generatorHtmlToPokemon(pokemonMap map[string]interface{}, number int) model.Pokemon {
 	return model.Pokemon{}
 }
 

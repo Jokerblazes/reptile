@@ -28,13 +28,13 @@ func Instance() *PokemonGetter {
 type PokemonGetter struct {
 }
 
-func (getter PokemonGetter) pokemonDetailHtml(number int) map[string]*goquery.Selection {
+func (getter *PokemonGetter) pokemonDetailHtml(number int) map[string]*goquery.Selection {
 	res, err := getter.send(number)
 	defer res.Body.Close()
 	return getter.selections(err, res)
 }
 
-func (getter PokemonGetter) selections(err error, res *http.Response) map[string]*goquery.Selection {
+func (getter *PokemonGetter) selections(err error, res *http.Response) map[string]*goquery.Selection {
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
 		log.Fatal(err)
@@ -49,7 +49,7 @@ func (getter PokemonGetter) selections(err error, res *http.Response) map[string
 		"minutia": minutiaSelection}
 }
 
-func (getter PokemonGetter) send(number int) (*http.Response, error) {
+func (getter *PokemonGetter) send(number int) (*http.Response, error) {
 	url := fmt.Sprintf("%s%d", "https://pokedex.org/#/pokemon/", number)
 	res, err := http.Get(url)
 	if err != nil {
@@ -60,7 +60,7 @@ func (getter PokemonGetter) send(number int) (*http.Response, error) {
 	}
 	return res, err
 }
-func (getter PokemonGetter) Pokemons() []model.Pokemon {
+func (getter *PokemonGetter) Pokemons() []model.Pokemon {
 	var pokemons []model.Pokemon
 	for i := 1; i < 650; i++ {
 		selectionMap := getter.pokemonDetailHtml(i)
@@ -69,7 +69,7 @@ func (getter PokemonGetter) Pokemons() []model.Pokemon {
 	return pokemons
 }
 
-func (getter PokemonGetter) generatorHtmlToPokemon(selectionMap map[string]*goquery.Selection, id int) model.Pokemon {
+func (getter *PokemonGetter) generatorHtmlToPokemon(selectionMap map[string]*goquery.Selection, id int) model.Pokemon {
 	headerSelection := selectionMap[Header]
 	statusSelection := selectionMap[Status]
 	minutiaSelection := selectionMap[Minutia]
@@ -93,7 +93,7 @@ func (getter PokemonGetter) generatorHtmlToPokemon(selectionMap map[string]*goqu
 	return pokemon
 }
 
-func (getter PokemonGetter) statusMap(statusSelection *goquery.Selection) map[string]string {
+func (getter *PokemonGetter) statusMap(statusSelection *goquery.Selection) map[string]string {
 	statusMap := make(map[string]string)
 	statusSelection.Each(func(i int, selection *goquery.Selection) {
 		first := selection.Nodes[0].FirstChild
@@ -106,7 +106,7 @@ func (getter PokemonGetter) statusMap(statusSelection *goquery.Selection) map[st
 	return statusMap
 }
 
-func (getter PokemonGetter) minutiaMap(minutiaSelection *goquery.Selection) map[string]string {
+func (getter *PokemonGetter) minutiaMap(minutiaSelection *goquery.Selection) map[string]string {
 	minutiaMap := make(map[string]string)
 	minutiaSelection.Each(func(i int, selection *goquery.Selection) {
 		first := selection.Nodes[0].FirstChild
