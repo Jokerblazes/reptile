@@ -1,6 +1,9 @@
 package db
 
-import "database/sql"
+import (
+	"database/sql"
+	_ "github.com/go-sql-driver/mysql"
+)
 
 func Db() *sql.DB {
 	db, err := sql.Open("mysql", "root:@/pokemon")

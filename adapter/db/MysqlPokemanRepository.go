@@ -31,7 +31,7 @@ func (repository MysqlPokemanRepository) SavePokemons(pokemons []model.Pokemon) 
 	defer stmtIns.Close()
 	failedNum := 0
 	for _, pokemon := range pokemons {
-		_, err := stmtIns.Exec(pokemon.Id, pokemon.Name, pokemon.Hp, pokemon.Attack, pokemon.Speed, pokemon.SpAtk, pokemon.SpDef, pokemon.Height, pokemon.Weight)
+		_, err := stmtIns.Exec(pokemon.Id, pokemon.Name, pokemon.Hp, pokemon.Attack, pokemon.Defense, pokemon.Speed, pokemon.SpAtk, pokemon.SpDef, pokemon.Height, pokemon.Weight)
 		if err != nil {
 			failedNum++
 			panic(err.Error()) // proper error handling instead of panic in your app
