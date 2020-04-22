@@ -5,16 +5,6 @@ import "reptile/domain/model"
 type Repository struct {
 }
 
-var instance *Repository
-
-func Instance() *Repository {
-	if instance == nil {
-		instance = &Repository{}
-	}
-
-	return instance
-}
-
 func (repository Repository) Pokemons() []model.Pokemon {
 
 	return nil

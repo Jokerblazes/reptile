@@ -15,16 +15,6 @@ const (
 	Minutia = "minutia"
 )
 
-var instance *PokemonGetter
-
-func Instance() *PokemonGetter {
-	if instance == nil {
-		instance = &PokemonGetter{}
-	}
-
-	return instance
-}
-
 type PokemonGetter struct {
 }
 

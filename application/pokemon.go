@@ -1,15 +1,14 @@
 package application
 
 import (
-	"reptile/adapter"
 	"reptile/adapter/api/url"
 	"reptile/adapter/db"
 )
 
 func Reptile() {
-	var getter adapter.PokemonGetter = url.Instance()
+	getter := url.PokemonGetter{}
 	pokemons := getter.Pokemons()
 
-	var saver = db.Instance()
+	var saver = db.Repository{}
 	saver.Save(pokemons)
 }
