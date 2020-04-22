@@ -54,7 +54,7 @@ func (getter *PokemonGetter) Pokemons() []model.Pokemon {
 	var pokemons []model.Pokemon
 	for i := 1; i < 650; i++ {
 		selectionMap := getter.pokemonDetailHtml(i)
-		pokemons[i-1] = getter.generatorHtmlToPokemon(selectionMap, i)
+		pokemons = append(pokemons, getter.generatorHtmlToPokemon(selectionMap, i))
 	}
 	return pokemons
 }

@@ -12,10 +12,10 @@ type PokemonGetter struct {
 }
 
 func (getter *PokemonGetter) Pokemons() []model.Pokemon {
-	pokemons := make([]model.Pokemon, 649)
-	for i := 1; i < 650; i++ {
+	var pokemons []model.Pokemon
+	for i := 2; i < 3; i++ {
 		name, statsMap, minutiaMap := getter.pokemonDetailHtml(i)
-		pokemons[i-1] = getter.generatorHtmlToPokemon(name, statsMap, minutiaMap, i)
+		pokemons = append(pokemons, getter.generatorHtmlToPokemon(name, statsMap, minutiaMap, i))
 	}
 	return pokemons
 }
