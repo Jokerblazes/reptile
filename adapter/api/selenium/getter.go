@@ -23,10 +23,10 @@ func (getter *PokemonGetter) Pokemons() []model.Pokemon {
 	defer service.Stop()
 	webView := *getter.getWebView()
 	defer webView.Close()
-
 	monsterButtons, _ := webView.FindElements(selenium.ByClassName, "monster-sprite")
+
 	for i, monsterButton := range monsterButtons {
-		name, statsMap, minutiaMap := getter.pokemonDetailHtml(monsterButton, webView)
+		name, statsMap, minutiaMap := getter.pokemonDetailHtml(i+1, monsterButton, webView)
 		pokemons = append(pokemons, getter.generatorHtmlToPokemon(name, statsMap, minutiaMap, i+1))
 	}
 	return pokemons
@@ -63,6 +63,13 @@ func (getter *PokemonGetter) getWebView() *selenium.WebDriver {
 	if err != nil {
 		fmt.Println("get page faild", err.Error())
 	}
+	//webView.Wait(func(wd selenium.WebDriver) (bool, error) {
+	//	values, err := wd.FindElements(selenium.ByClassName, "monster-sprite")
+	//	if err != nil || len(values) != 649 {
+	//		return false, err
+	//	}
+	//	return true, nil
+	//})
 	return &webView
 }
 
@@ -76,8 +83,11 @@ func (getter *PokemonGetter) startService() (*selenium.Service, error) {
 	}
 	return service, err
 }
-func (getter *PokemonGetter) pokemonDetailHtml(monsterButton selenium.WebElement, view selenium.WebDriver) (name string, statsMap map[string]string, minutiaMap map[string]string) {
-	monsterButton.Click()
+func (getter *PokemonGetter) pokemonDetailHtml(number int, monsterButton selenium.WebElement, view selenium.WebDriver) (name string, statsMap map[string]string, minutiaMap map[string]string) {
+	view.Get(fmt.Sprintf("%s%d", "https://pokedex.org/#/pokemon/", number))
+	defer func() {
+		view.Get("https://pokedex.org/#/")
+	}()
 	view.Wait(func(wd selenium.WebDriver) (bool, error) {
 		value, err := view.FindElement(selenium.ByClassName, "detail-panel-header")
 		b, err2, done := getter.resourceReady(err, []selenium.WebElement{value})
@@ -107,10 +117,10 @@ func (getter *PokemonGetter) pokemonDetailHtml(monsterButton selenium.WebElement
 		return true, nil
 	})
 
-	defer func() {
-		backButton, _ := view.FindElement(selenium.ByClassName, "back-button")
-		backButton.Click()
-	}()
+	//defer func() {
+	//	backButton, _ := view.FindElement(selenium.ByClassName, "back-button")
+	//	backButton.Click()
+	//}()
 	minutiaMap = make(map[string]string)
 	statsMap = make(map[string]string)
 	headerElement, _ := view.FindElement(selenium.ByClassName, "detail-panel-header")
