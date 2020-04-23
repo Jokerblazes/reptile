@@ -65,13 +65,6 @@ func (getter *PokemonGetter) getWebView() *selenium.WebDriver {
 	if err != nil {
 		fmt.Println("get page faild", err.Error())
 	}
-	//webView.Wait(func(wd selenium.WebDriver) (bool, error) {
-	//	values, err := wd.FindElements(selenium.ByClassName, "monster-sprite")
-	//	if err != nil || len(values) != 649 {
-	//		return false, err
-	//	}
-	//	return true, nil
-	//})
 	return &webView
 }
 
