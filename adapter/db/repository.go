@@ -10,7 +10,7 @@ func (repository Repository) Pokemons() []model.Pokemon {
 	return nil
 }
 
-func (repository Repository) Save(pokemons []model.Pokemon) (int, []error) {
+func (repository *Repository) Save(pokemons []model.Pokemon) (int, []error) {
 	db := Db()
 	defer db.Close()
 	stmtIns, err := db.Prepare("INSERT INTO `pokemon` (`id`, `name`, `hp`, `attack`, `defense`, `speed`, `sp_atk`, `sp_def`, `height`, `weight`) " +
