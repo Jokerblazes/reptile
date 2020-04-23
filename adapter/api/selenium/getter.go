@@ -21,8 +21,10 @@ func (getter *PokemonGetter) Pokemons() []model.Pokemon {
 	var pokemons []model.Pokemon
 	service, _ := getter.startService()
 	defer service.Stop()
+
 	webView := *getter.getWebView()
 	defer webView.Close()
+
 	monsterButtons, _ := webView.FindElements(selenium.ByClassName, "monster-sprite")
 
 	for i, monsterButton := range monsterButtons {
@@ -88,7 +90,46 @@ func (getter *PokemonGetter) pokemonDetailHtml(number int, monsterButton seleniu
 	defer func() {
 		view.Get("https://pokedex.org/#/")
 	}()
-	view.Wait(func(wd selenium.WebDriver) (bool, error) {
+
+	getter.waitResource(view)
+
+	headerElement, _ := view.FindElement(selenium.ByClassName, "detail-panel-header")
+	statsElements, _ := view.FindElements(selenium.ByClassName, "detail-stats-row")
+	minutiaElements, _ := view.FindElements(selenium.ByClassName, "monster-minutia")
+
+	name, _ = headerElement.Text()
+	statsMap = getter.generateStats(statsMap, statsElements)
+	minutiaMap = getter.generateMinutia(minutiaMap, minutiaElements)
+	return name, statsMap, minutiaMap
+}
+
+func (getter *PokemonGetter) generateMinutia(minutiaMap map[string]string, minutiaElements []selenium.WebElement) map[string]string {
+	minutiaMap = make(map[string]string)
+	for _, minutia := range minutiaElements {
+		keys, _ := minutia.FindElements(selenium.ByTagName, "strong")
+		values, _ := minutia.FindElements(selenium.ByTagName, "span")
+		for i := 0; i < len(keys); i++ {
+			key, _ := keys[i].Text()
+			value, _ := values[i].Text()
+			minutiaMap[key] = value
+		}
+	}
+	return minutiaMap
+}
+
+func (getter *PokemonGetter) generateStats(statsMap map[string]string, statsElements []selenium.WebElement) map[string]string {
+	statsMap = make(map[string]string)
+	for _, stats := range statsElements {
+		keyValueElement, _ := stats.FindElements(selenium.ByTagName, "span")
+		key, _ := keyValueElement[0].Text()
+		value, _ := keyValueElement[1].Text()
+		statsMap[key] = value
+	}
+	return statsMap
+}
+
+func (getter *PokemonGetter) waitResource(view selenium.WebDriver) error {
+	return view.Wait(func(wd selenium.WebDriver) (bool, error) {
 		value, err := view.FindElement(selenium.ByClassName, "detail-panel-header")
 		b, err2, done := getter.resourceReady(err, []selenium.WebElement{value})
 		if done {
@@ -116,34 +157,6 @@ func (getter *PokemonGetter) pokemonDetailHtml(number int, monsterButton seleniu
 		}
 		return true, nil
 	})
-
-	//defer func() {
-	//	backButton, _ := view.FindElement(selenium.ByClassName, "back-button")
-	//	backButton.Click()
-	//}()
-	minutiaMap = make(map[string]string)
-	statsMap = make(map[string]string)
-	headerElement, _ := view.FindElement(selenium.ByClassName, "detail-panel-header")
-	statsElements, _ := view.FindElements(selenium.ByClassName, "detail-stats-row")
-	minutiaElements, _ := view.FindElements(selenium.ByClassName, "monster-minutia")
-	name, _ = headerElement.Text()
-	for _, stats := range statsElements {
-		keyValueElement, _ := stats.FindElements(selenium.ByTagName, "span")
-		key, _ := keyValueElement[0].Text()
-		value, _ := keyValueElement[1].Text()
-		statsMap[key] = value
-	}
-
-	for _, minutia := range minutiaElements {
-		keys, _ := minutia.FindElements(selenium.ByTagName, "strong")
-		values, _ := minutia.FindElements(selenium.ByTagName, "span")
-		for i := 0; i < len(keys); i++ {
-			key, _ := keys[i].Text()
-			value, _ := values[i].Text()
-			minutiaMap[key] = value
-		}
-	}
-	return name, statsMap, minutiaMap
 }
 
 func (getter *PokemonGetter) resourceReady(err error, values []selenium.WebElement) (bool, error, bool) {
