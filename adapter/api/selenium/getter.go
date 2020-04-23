@@ -6,6 +6,12 @@ import (
 	"github.com/tebeka/selenium/chrome"
 	"reptile/domain/model"
 	"strconv"
+	"strings"
+)
+
+const (
+	seleniumPath = `./chromedriver`
+	port         = 9515
 )
 
 type PokemonGetter struct {
@@ -13,26 +19,20 @@ type PokemonGetter struct {
 
 func (getter *PokemonGetter) Pokemons() []model.Pokemon {
 	var pokemons []model.Pokemon
-	for i := 2; i < 3; i++ {
-		name, statsMap, minutiaMap := getter.pokemonDetailHtml(i)
-		pokemons = append(pokemons, getter.generatorHtmlToPokemon(name, statsMap, minutiaMap, i))
+	service, _ := getter.startService()
+	defer service.Stop()
+	webView := *getter.getWebView()
+	defer webView.Close()
+
+	monsterButtons, _ := webView.FindElements(selenium.ByClassName, "monster-sprite")
+	for i, monsterButton := range monsterButtons {
+		name, statsMap, minutiaMap := getter.pokemonDetailHtml(monsterButton, webView)
+		pokemons = append(pokemons, getter.generatorHtmlToPokemon(name, statsMap, minutiaMap, i+1))
 	}
 	return pokemons
 }
 
-func (getter *PokemonGetter) pokemonDetailHtml(number int) (name string, statsMap map[string]string, minutiaMap map[string]string) {
-	const (
-		seleniumPath = `./chromedriver`
-		port         = 9515
-	)
-
-	opts := []selenium.ServiceOption{}
-
-	service, err := selenium.NewChromeDriverService(seleniumPath, port, opts...)
-	if nil != err {
-		fmt.Println("start a chromedriver service falid", err.Error())
-	}
-	defer service.Stop()
+func (getter *PokemonGetter) getWebView() *selenium.WebDriver {
 
 	caps := selenium.Capabilities{
 		"browserName": "chrome",
@@ -58,18 +58,64 @@ func (getter *PokemonGetter) pokemonDetailHtml(number int) (name string, statsMa
 	if err != nil {
 		fmt.Println("connect to the webDriver faild", err.Error())
 	}
-	defer webView.Close()
 	//打開一個網頁
-	err = webView.Get(fmt.Sprintf("%s%d", "https://pokedex.org/#/pokemon/", number))
+	err = webView.Get("https://pokedex.org/#/")
 	if err != nil {
 		fmt.Println("get page faild", err.Error())
 	}
+	return &webView
+}
+
+func (getter *PokemonGetter) startService() (*selenium.Service, error) {
+
+	opts := []selenium.ServiceOption{}
+
+	service, err := selenium.NewChromeDriverService(seleniumPath, port, opts...)
+	if nil != err {
+		fmt.Println("start a chromedriver service falid", err.Error())
+	}
+	return service, err
+}
+func (getter *PokemonGetter) pokemonDetailHtml(monsterButton selenium.WebElement, view selenium.WebDriver) (name string, statsMap map[string]string, minutiaMap map[string]string) {
+	monsterButton.Click()
+	view.Wait(func(wd selenium.WebDriver) (bool, error) {
+		value, err := view.FindElement(selenium.ByClassName, "detail-panel-header")
+		b, err2, done := getter.resourceReady(err, []selenium.WebElement{value})
+		if done {
+			return b, err2
+		}
+		values, err := view.FindElements(selenium.ByCSSSelector, ".detail-stats-row span")
+		b2, err3, done2 := getter.resourceReady(err, values)
+		if done2 {
+			return b2, err3
+		}
+		values, err = view.FindElements(selenium.ByCSSSelector, ".monster-minutia span")
+		b2, err3, done2 = getter.resourceReady(err, values)
+		if done2 {
+			return b2, err3
+		}
+		values, err = view.FindElements(selenium.ByCSSSelector, ".monster-minutia strong")
+		b2, err3, done2 = getter.resourceReady(err, values)
+		if done2 {
+			return b2, err3
+		}
+		values, err = view.FindElements(selenium.ByClassName, "stat-bar-fg")
+		b2, err3, done2 = getter.resourceReady(err, values)
+		if done2 {
+			return b2, err3
+		}
+		return true, nil
+	})
+
+	defer func() {
+		backButton, _ := view.FindElement(selenium.ByClassName, "back-button")
+		backButton.Click()
+	}()
 	minutiaMap = make(map[string]string)
 	statsMap = make(map[string]string)
-
-	headerElement, _ := webView.FindElement(selenium.ByClassName, "detail-panel-header")
-	statsElements, _ := webView.FindElements(selenium.ByClassName, "detail-stats-row")
-	minutiaElements, _ := webView.FindElements(selenium.ByClassName, "monster-minutia")
+	headerElement, _ := view.FindElement(selenium.ByClassName, "detail-panel-header")
+	statsElements, _ := view.FindElements(selenium.ByClassName, "detail-stats-row")
+	minutiaElements, _ := view.FindElements(selenium.ByClassName, "monster-minutia")
 	name, _ = headerElement.Text()
 	for _, stats := range statsElements {
 		keyValueElement, _ := stats.FindElements(selenium.ByTagName, "span")
@@ -88,6 +134,19 @@ func (getter *PokemonGetter) pokemonDetailHtml(number int) (name string, statsMa
 		}
 	}
 	return name, statsMap, minutiaMap
+}
+
+func (getter *PokemonGetter) resourceReady(err error, values []selenium.WebElement) (bool, error, bool) {
+	if err != nil {
+		return false, err, true
+	}
+	for _, value := range values {
+		text, err := value.Text()
+		if err != nil || strings.EqualFold(text, "") {
+			return false, err, true
+		}
+	}
+	return false, nil, false
 }
 
 func (getter *PokemonGetter) generatorHtmlToPokemon(name string, statsMap map[string]string, minutiaMap map[string]string, number int) model.Pokemon {
