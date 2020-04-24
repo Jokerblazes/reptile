@@ -26,7 +26,7 @@ func (getter *PokemonGetter) Pokemons() []model.Pokemon {
 
 	monsterButtons, _ := webView.FindElements(selenium.ByClassName, "monster-sprite")
 
-	for i, monsterButton := range monsterButtons {
+	for i := range monsterButtons {
 		name, statsMap, minutiaMap := getter.pokemonDetailHtml(i+1, webView)
 		pokemons = append(pokemons, getter.generatorHtmlToPokemon(name, statsMap, minutiaMap, i+1))
 	}
