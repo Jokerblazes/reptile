@@ -45,9 +45,6 @@ func (getter *PokemonGetter) getWebView() *selenium.WebDriver {
 
 func (getter *PokemonGetter) pokemonDetailHtml(number int, view selenium.WebDriver) (name string, statsMap map[string]string, minutiaMap map[string]string) {
 	view.Get(fmt.Sprintf("%s%d", "https://pokedex.org/#/pokemon/", number))
-	defer func() {
-		view.Get("https://pokedex.org/#/")
-	}()
 
 	getter.waitResource(view)
 
