@@ -19,8 +19,10 @@ func (repository *Repository) Save(pokemonChan chan model.Pokemon) error {
 		return err
 	}
 	defer stmtIns.Close()
-	for pokemon := range pokemonChan {
-		stmtIns.Exec(pokemon.Id, pokemon.Name, pokemon.Hp, pokemon.Attack, pokemon.Defense, pokemon.Speed, pokemon.SpAtk, pokemon.SpDef, pokemon.Height, pokemon.Weight)
-	}
+	go func() {
+		for pokemon := range pokemonChan {
+			stmtIns.Exec(pokemon.Id, pokemon.Name, pokemon.Hp, pokemon.Attack, pokemon.Defense, pokemon.Speed, pokemon.SpAtk, pokemon.SpDef, pokemon.Height, pokemon.Weight)
+		}
+	}()
 	return nil
 }
