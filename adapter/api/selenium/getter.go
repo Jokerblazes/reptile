@@ -16,8 +16,7 @@ const (
 type PokemonGetter struct {
 }
 
-func (getter *PokemonGetter) Pokemons() []model.Pokemon {
-	var pokemons []model.Pokemon
+func (getter *PokemonGetter) Pokemons() chan model.Pokemon {
 	service := StartService()
 	defer service.Stop()
 
@@ -25,12 +24,14 @@ func (getter *PokemonGetter) Pokemons() []model.Pokemon {
 	defer webView.Close()
 
 	monsterButtons, _ := webView.FindElements(selenium.ByClassName, "monster-sprite")
-
-	for i := range monsterButtons {
-		name, statsMap, minutiaMap := getter.pokemonDetailHtml(i+1, webView)
-		pokemons = append(pokemons, getter.generatorHtmlToPokemon(name, statsMap, minutiaMap, i+1))
-	}
-	return pokemons
+	var pokemonChan = make(chan model.Pokemon)
+	go func() {
+		for i := range monsterButtons {
+			name, statsMap, minutiaMap := getter.pokemonDetailHtml(i+1, webView)
+			pokemonChan <- getter.generatorHtmlToPokemon(name, statsMap, minutiaMap, i+1)
+		}
+	}()
+	return pokemonChan
 }
 
 func (getter *PokemonGetter) getWebView() *selenium.WebDriver {
