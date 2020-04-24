@@ -16,7 +16,7 @@ func (repository *Repository) Save(pokemons []model.Pokemon) (int, []error) {
 	stmtIns, err := db.Prepare("INSERT INTO `pokemon` (`id`, `name`, `hp`, `attack`, `defense`, `speed`, `sp_atk`, `sp_def`, `height`, `weight`) " +
 		"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
-		panic(err.Error()) // proper error handling instead of panic in your app
+		return 0, []error{err}
 	}
 	defer stmtIns.Close()
 	failedNum := 0
