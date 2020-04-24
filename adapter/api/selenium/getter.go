@@ -27,7 +27,7 @@ func (getter *PokemonGetter) Pokemons() []model.Pokemon {
 	monsterButtons, _ := webView.FindElements(selenium.ByClassName, "monster-sprite")
 
 	for i, monsterButton := range monsterButtons {
-		name, statsMap, minutiaMap := getter.pokemonDetailHtml(i+1, monsterButton, webView)
+		name, statsMap, minutiaMap := getter.pokemonDetailHtml(i+1, webView)
 		pokemons = append(pokemons, getter.generatorHtmlToPokemon(name, statsMap, minutiaMap, i+1))
 	}
 	return pokemons
@@ -43,7 +43,7 @@ func (getter *PokemonGetter) getWebView() *selenium.WebDriver {
 	return &webView
 }
 
-func (getter *PokemonGetter) pokemonDetailHtml(number int, monsterButton selenium.WebElement, view selenium.WebDriver) (name string, statsMap map[string]string, minutiaMap map[string]string) {
+func (getter *PokemonGetter) pokemonDetailHtml(number int, view selenium.WebDriver) (name string, statsMap map[string]string, minutiaMap map[string]string) {
 	view.Get(fmt.Sprintf("%s%d", "https://pokedex.org/#/pokemon/", number))
 	defer func() {
 		view.Get("https://pokedex.org/#/")
