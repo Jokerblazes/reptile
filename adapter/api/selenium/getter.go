@@ -18,7 +18,7 @@ type PokemonGetter struct {
 
 func (getter *PokemonGetter) Pokemons() []model.Pokemon {
 	var pokemons []model.Pokemon
-	service, _ := StartService()
+	service := StartService()
 	defer service.Stop()
 
 	webView := *getter.getWebView()

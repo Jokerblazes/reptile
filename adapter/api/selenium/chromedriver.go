@@ -6,14 +6,14 @@ import (
 	"github.com/tebeka/selenium/chrome"
 )
 
-func StartService() (*selenium.Service, error) {
+func StartService() *selenium.Service {
 	opts := []selenium.ServiceOption{}
 
 	service, err := selenium.NewChromeDriverService(seleniumPath, port, opts...)
 	if nil != err {
 		fmt.Println("start a chromedriver service falid", err.Error())
 	}
-	return service, err
+	return service
 }
 
 func WebView() (selenium.WebDriver, error) {
